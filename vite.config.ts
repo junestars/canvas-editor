@@ -3,6 +3,15 @@ import typescript from '@rollup/plugin-typescript'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 import * as path from 'path'
 
+const scriptNoModule = () => {
+  return {
+    name: 'no-attribute',
+    transformIndexHtml(html) {
+      return html.replace(`type="module" crossorigin`, '')
+    }
+  }
+}
+
 export default defineConfig(({ mode }) => {
   const name = 'canvas-editor'
   if (mode === 'lib') {
@@ -38,9 +47,10 @@ export default defineConfig(({ mode }) => {
     }
   }
   return {
-    base: `/${name}/`,
+    base: `./`,
     server: {
       host: '0.0.0.0'
-    }
+    },
+    plugins: [scriptNoModule()]
   }
 })
