@@ -144,11 +144,11 @@ export function pasteByEvent(host: CanvasEvent, evt: ClipboardEvent) {
     const overrideResult = paste(pasteData)
 
     if (isPromise(overrideResult)) {
-      ;(<Promise<unknown>>overrideResult).then(
+      (<Promise<unknown>>overrideResult).then(
         () => {
           pasteByEventDefault(host, pasteData)
         },
-        () => {}
+        () => undefined
       )
       return
     } else if ((<IOverrideResult>overrideResult).preventDefault !== false) {
@@ -224,11 +224,11 @@ export async function pasteByApi(host: CanvasEvent, options?: IPasteOption) {
     const overrideResult = paste()
 
     if (isPromise(overrideResult)) {
-      ;(<Promise<unknown>>overrideResult).then(
+      (<Promise<unknown>>overrideResult).then(
         () => {
           pasteByApiDefault(host, options)
         },
-        () => {}
+        () => undefined
       )
       return
     } else if ((<IOverrideResult>overrideResult).preventDefault !== false) {
