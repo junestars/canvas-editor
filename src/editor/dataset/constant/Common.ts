@@ -42,3 +42,14 @@ export const LETTER_CLASS = {
 }
 
 export const METRICS_BASIS_TEXT = '日'
+
+/**
+ * 从 word 粘贴的数据(html 格式)中匹配 img 标签
+ */
+export const IMG_LOCAL_SOURCE_REGEXP =
+  /<img\s[^>]*src\s*=\s*["']file:\/\/([^'"]+)["'][^>]*\/?>/g
+
+/**
+ * 匹配 img 标签的 scr 属性
+ */
+export const IMG_SRC_REGEXP = /src\s*=\s*["'](.*?)["']/

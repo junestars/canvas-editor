@@ -2,11 +2,11 @@ import { ZERO } from '../../../dataset/constant/Common'
 import { VIRTUAL_ELEMENT_TYPE } from '../../../dataset/constant/Element'
 import { ElementType } from '../../../dataset/enum/Element'
 import { IElement } from '../../../interface/Element'
-import { IPasteOption } from '../../../interface/Event'
+import { IPasteOption, IPasteEventData } from '../../../interface/Event'
 import {
   getClipboardData,
-  getIsClipboardContainFile,
-  removeClipboardData
+  removeClipboardData,
+  getPasteDataByNativeClipboardData
 } from '../../../utils/clipboard'
 import {
   formatElementContext,
@@ -14,6 +14,8 @@ import {
 } from '../../../utils/element'
 import { CanvasEvent } from '../CanvasEvent'
 import { IOverrideResult } from '../../override/Override'
+
+import { isPromise } from '../../../utils'
 
 export function pasteElement(host: CanvasEvent, elementList: IElement[]) {
   const draw = host.getDraw()
@@ -97,75 +99,67 @@ export function pasteImage(host: CanvasEvent, file: File | Blob) {
   }
 }
 
-export function pasteByEvent(host: CanvasEvent, evt: ClipboardEvent) {
-  const draw = host.getDraw()
-  const isReadonly = draw.isReadonly()
-  if (isReadonly) return
-  const clipboardData = evt.clipboardData
-  if (!clipboardData) return
-  // 自定义粘贴事件
-  const { paste } = draw.getOverride()
-  if (paste) {
-    const overrideResult = paste(evt)
-    // 默认阻止默认事件
-    if ((<IOverrideResult>overrideResult)?.preventDefault !== false) return
-  }
+function pasteByEventDefault(host: CanvasEvent, pasteData: IPasteEventData) {
+  const { text, html, files } = pasteData
+
   // 优先读取编辑器内部粘贴板数据（粘贴板不包含文件时）
-  if (!getIsClipboardContainFile(clipboardData)) {
-    const clipboardText = clipboardData.getData('text')
+  if (!files.length) {
+    const clipboardText = text
     const editorClipboardData = getClipboardData()
     if (clipboardText === editorClipboardData?.text) {
       pasteElement(host, editorClipboardData.elementList)
       return
     }
   }
+
   removeClipboardData()
-  // 从粘贴板提取数据
-  let isHTML = false
-  for (let i = 0; i < clipboardData.items.length; i++) {
-    const item = clipboardData.items[i]
-    if (item.type === 'text/html') {
-      isHTML = true
-      break
-    }
-  }
-  for (let i = 0; i < clipboardData.items.length; i++) {
-    const item = clipboardData.items[i]
-    if (item.kind === 'string') {
-      if (item.type === 'text/plain' && !isHTML) {
-        item.getAsString(plainText => {
-          host.input(plainText)
-        })
-        break
+
+  if (files.length) {
+    // 全是文件才走这里
+    files.forEach(file => {
+      if (file.type.includes('image')) {
+        pasteImage(host, file)
       }
-      if (item.type === 'text/html' && isHTML) {
-        item.getAsString(htmlText => {
-          pasteHTML(host, htmlText)
-        })
-        break
-      }
-    } else if (item.kind === 'file') {
-      if (item.type.includes('image')) {
-        const file = item.getAsFile()
-        if (file) {
-          pasteImage(host, file)
-        }
-      }
-    }
+    })
+  } else if (html) {
+    // 如果是 从 rtf 中解析出的文件，应该走这里，并将 html 中的 img 的 src 替换掉
+    pasteHTML(host, html)
+  } else if (text) {
+    host.input(text)
   }
 }
 
-export async function pasteByApi(host: CanvasEvent, options?: IPasteOption) {
+export function pasteByEvent(host: CanvasEvent, evt: ClipboardEvent) {
   const draw = host.getDraw()
   const isReadonly = draw.isReadonly()
   if (isReadonly) return
-  // 自定义粘贴事件
+  const clipboardData = evt.clipboardData
+  if (!clipboardData) return
+
+  const pasteData = getPasteDataByNativeClipboardData(clipboardData)
+
   const { paste } = draw.getOverride()
+
   if (paste) {
-    const overrideResult = paste()
-    // 默认阻止默认事件
-    if ((<IOverrideResult>overrideResult)?.preventDefault !== false) return
+    const overrideResult = paste(pasteData)
+
+    if (isPromise(overrideResult)) {
+      ;(<Promise<unknown>>overrideResult).then(
+        () => {
+          pasteByEventDefault(host, pasteData)
+        },
+        () => {}
+      )
+      return
+    } else if ((<IOverrideResult>overrideResult).preventDefault !== false) {
+      return
+    }
   }
+
+  pasteByEventDefault(host, pasteData)
+}
+
+async function pasteByApiDefault(host: CanvasEvent, options?: IPasteOption) {
   // 优先读取编辑器内部粘贴板数据
   const clipboardText = await navigator.clipboard.readText()
   const editorClipboardData = getClipboardData()
@@ -208,4 +202,39 @@ export async function pasteByApi(host: CanvasEvent, options?: IPasteOption) {
       }
     }
   }
+}
+
+/**
+ * pasteByApi 基于 navigator.clipboard 获取剪切板数据，不推荐使用，原因如下
+ *
+ * 从 navigator.clipboard 中读取的剪切板数据并不如 paste 事件对象中的数据完整
+ *
+ *    - 从 office 粘贴时，navigator.clipboard 不包含 rtf 格式的数据
+ *    - 从文件系统拷贝图片文件时，navigator.clipboard 读取不到文件
+ */
+export async function pasteByApi(host: CanvasEvent, options?: IPasteOption) {
+  const draw = host.getDraw()
+  const isReadonly = draw.isReadonly()
+  if (isReadonly) return
+
+  // 自定义粘贴事件
+  const { paste } = draw.getOverride()
+
+  if (paste) {
+    const overrideResult = paste()
+
+    if (isPromise(overrideResult)) {
+      ;(<Promise<unknown>>overrideResult).then(
+        () => {
+          pasteByApiDefault(host, options)
+        },
+        () => {}
+      )
+      return
+    } else if ((<IOverrideResult>overrideResult).preventDefault !== false) {
+      return
+    }
+  }
+
+  pasteByApiDefault(host, options)
 }

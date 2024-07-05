@@ -22,8 +22,22 @@ interface IOverrideResult {
 
 用法：
 
+```typescript
+interface IPasteEventData {
+  text: string
+  html: string
+  rtf: string
+  files: File[]
+}
+```
+
 ```javascript
-instance.override.paste = (evt?: ClipboardEvent) => unknown | IOverrideResult
+// 仅 override.paste 支持返回 Promise
+// Promise 被兑现，表示继续执行内部默认方法，否则表示阻止
+
+// 可根据 paste 是否接收到参数判断 调用 paste 的类型
+// 有参数表示 Event 调用，无参数表示 API 调用
+instance.override.paste = (evt?: IPasteEventData) => unknown | IOverrideResult | Promise<unknown>
 ```
 
 ## copy
