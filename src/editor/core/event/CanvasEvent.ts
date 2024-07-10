@@ -32,7 +32,13 @@ export class CanvasEvent {
   public isComposing: boolean
   public compositionInfo: ICompositionInfo | null
 
+  /**
+   * 是否允许拖拽
+   */
   public isAllowDrag: boolean
+  /**
+   * 是否允许拖放
+   */
   public isAllowDrop: boolean
   public cacheRange: IRange | null
   public cacheElementList: IElement[] | null
@@ -96,6 +102,9 @@ export class CanvasEvent {
     this.isAllowDrop = payload
   }
 
+  /**
+   * 清除格式刷的样式
+   */
   public clearPainterStyle() {
     this.pageList.forEach(p => {
       p.style.cursor = 'text'
@@ -103,6 +112,9 @@ export class CanvasEvent {
     this.draw.setPainterStyle(null)
   }
 
+  /**
+   * 应用格式刷的风格
+   */
   public applyPainterStyle() {
     const painterStyle = this.draw.getPainterStyle()
     if (!painterStyle) return
@@ -164,6 +176,9 @@ export class CanvasEvent {
     click.dblclick(this, evt)
   }
 
+  /**
+   * 三击选中整行
+   */
   public threeClick() {
     click.threeClick(this)
   }

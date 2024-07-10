@@ -67,10 +67,16 @@ export class Cursor {
     this.getAgentDom().value = ''
   }
 
+  /**
+   * 设置光标闪烁
+   */
   private _blinkStart() {
     this.cursorDom.classList.add(this.ANIMATION_CLASS)
   }
 
+  /**
+   * 关闭光标闪烁
+   */
   private _blinkStop() {
     this.cursorDom.classList.remove(this.ANIMATION_CLASS)
   }
@@ -90,6 +96,9 @@ export class Cursor {
     }
   }
 
+  /**
+   * 绘制光标
+   */
   public drawCursor(payload?: IDrawCursorOption) {
     let cursorPosition = this.position.getCursorPosition()
     if (!cursorPosition) return
@@ -162,11 +171,17 @@ export class Cursor {
     }
   }
 
+  /**
+   * 隐藏光标
+   */
   public recoveryCursor() {
     this.cursorDom.style.display = 'none'
     this._clearBlinkTimeout()
   }
 
+  /**
+   * 将光标所在的行滚动到可视范围内
+   */
   public moveCursorToVisible(payload: IMoveCursorToVisibleOption) {
     const { cursorPosition, direction } = payload
     if (!cursorPosition || !direction) return

@@ -50,6 +50,8 @@ export class GlobalEvent {
     document.addEventListener('keyup', this.setRangeStyle)
     document.addEventListener('click', this.clearSideEffect)
     document.addEventListener('mouseup', this.setCanvasEventAbility)
+
+    // 滚轮事件设置页面缩放
     document.addEventListener('wheel', this.setPageScale, { passive: false })
     document.addEventListener('visibilitychange', this._handleVisibilityChange)
     this.dprMediaQueryList.addEventListener('change', this._handleDprChange)

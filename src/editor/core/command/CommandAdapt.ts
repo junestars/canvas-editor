@@ -134,30 +134,48 @@ export class CommandAdapt {
     this.zone = draw.getZone()
   }
 
+  /**
+   * 设置编辑器模式
+   */
   public mode(payload: EditorMode) {
     this.draw.setMode(payload)
   }
 
+  /**
+   * 剪切
+   */
   public cut() {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
     this.canvasEvent.cut()
   }
 
+  /**
+   * 拷贝
+   */
   public copy() {
     this.canvasEvent.copy()
   }
 
+  /**
+   * 粘贴
+   */
   public paste(payload?: IPasteOption) {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
     pasteByApi(this.canvasEvent, payload)
   }
 
+  /**
+   * 全选
+   */
   public selectAll() {
     this.canvasEvent.selectAll()
   }
 
+  /**
+   * 退格删除
+   */
   public backspace() {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -186,6 +204,9 @@ export class CommandAdapt {
     this.draw.render({ curIndex })
   }
 
+  /**
+   * 设置选区
+   */
   public setRange(
     startIndex: number,
     endIndex: number,
@@ -214,6 +235,9 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 替换选区
+   */
   public replaceRange(range: IRange) {
     this.setRange(
       range.startIndex,
@@ -226,6 +250,9 @@ export class CommandAdapt {
     )
   }
 
+  /**
+   * 设置位置上下文
+   */
   public setPositionContext(range: IRange) {
     const { tableId, startTrIndex, startTdIndex } = range
     const elementList = this.draw.getOriginalElementList()
@@ -251,6 +278,9 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   * 强制重新渲染文档
+   */
   public forceUpdate(options?: IForceUpdateOption) {
     const { isSubmitHistory = false } = options || {}
     this.range.clearRange()
@@ -260,23 +290,35 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 设置文档失去焦点
+   */
   public blur() {
     this.range.clearRange()
     this.draw.getCursor().recoveryCursor()
   }
 
+  /**
+   * 撤销
+   */
   public undo() {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
     this.historyManager.undo()
   }
 
+  /**
+   * 重做
+   */
   public redo() {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
     this.historyManager.redo()
   }
 
+  /**
+   * 设置或清空格式刷的样式，如果单击且已经有样式设置则清空格式刷的样式
+   */
   public painter(options: IPainterOption) {
     // 如果单击且已经有样式设置则取消设置
     if (!options.isDblclick && this.draw.getPainterStyle()) {
@@ -298,6 +340,9 @@ export class CommandAdapt {
     this.draw.setPainterStyle(painterStyle, options)
   }
 
+  /**
+   * 应用格式刷的风格
+   */
   public applyPainterStyle() {
     const isDisabled =
       this.draw.isReadonly() || this.control.getIsDisabledControl()
@@ -305,6 +350,9 @@ export class CommandAdapt {
     this.canvasEvent.applyPainterStyle()
   }
 
+  /**
+   * 清除选区的样式
+   */
   public format() {
     const isDisabled =
       this.draw.isReadonly() || this.control.getIsDisabledControl()
@@ -334,6 +382,9 @@ export class CommandAdapt {
     this.draw.render(renderOption)
   }
 
+  /**
+   * 设置字体类型
+   */
   public font(payload: string) {
     const isDisabled =
       this.draw.isReadonly() || this.control.getIsDisabledControl()
@@ -355,6 +406,9 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   * 设置字体大小
+   */
   public size(payload: number) {
     const { minSize, maxSize, defaultSize } = this.options
     if (payload < minSize || payload > maxSize) return
@@ -394,6 +448,9 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   * 增加字体大小
+   */
   public sizeAdd() {
     const isDisabled =
       this.draw.isReadonly() || this.control.getIsDisabledControl()
@@ -434,6 +491,9 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   * 减小字体大小
+   */
   public sizeMinus() {
     const isDisabled =
       this.draw.isReadonly() || this.control.getIsDisabledControl()
@@ -474,6 +534,9 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   * 设置或取消字体加粗
+   */
   public bold() {
     const isDisabled =
       this.draw.isReadonly() || this.control.getIsDisabledControl()
@@ -496,6 +559,9 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   * 设置或取消字体斜体
+   */
   public italic() {
     const isDisabled =
       this.draw.isReadonly() || this.control.getIsDisabledControl()
@@ -518,6 +584,9 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   * 设置或取消字体下划线
+   */
   public underline(textDecoration?: ITextDecoration) {
     const isDisabled =
       this.draw.isReadonly() || this.control.getIsDisabledControl()
@@ -557,6 +626,9 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   * 设置或取消字体删除线
+   */
   public strikeout() {
     const isDisabled =
       this.draw.isReadonly() || this.control.getIsDisabledControl()
@@ -582,6 +654,9 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   * 设置或取消字体上标
+   */
   public superscript() {
     const isDisabled =
       this.draw.isReadonly() || this.control.getIsDisabledControl()
@@ -612,6 +687,9 @@ export class CommandAdapt {
     this.draw.render({ isSetCursor: false })
   }
 
+  /**
+   * 设置或取消字体下标
+   */
   public subscript() {
     const isDisabled =
       this.draw.isReadonly() || this.control.getIsDisabledControl()
@@ -642,6 +720,9 @@ export class CommandAdapt {
     this.draw.render({ isSetCursor: false })
   }
 
+  /**
+   * 设置字体颜色
+   */
   public color(payload: string | null) {
     const isDisabled =
       this.draw.isReadonly() || this.control.getIsDisabledControl()
@@ -674,6 +755,9 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   * 设置字体高亮（背景色）
+   */
   public highlight(payload: string | null) {
     const isDisabled =
       this.draw.isReadonly() || this.control.getIsDisabledControl()
@@ -706,6 +790,10 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   *
+   * 设置或取消标题
+   */
   public title(payload: TitleLevel | null) {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -746,12 +834,18 @@ export class CommandAdapt {
     this.draw.render({ curIndex, isSetCursor })
   }
 
+  /**
+   * 设置或取消列表
+   */
   public list(listType: ListType | null, listStyle?: ListStyle) {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
     this.draw.getListParticle().setList(listType, listStyle)
   }
 
+  /**
+   * 设置行文本对齐方式
+   */
   public rowFlex(payload: RowFlex) {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -768,6 +862,9 @@ export class CommandAdapt {
     this.draw.render({ curIndex, isSetCursor })
   }
 
+  /**
+   * 设置行间距
+   */
   public rowMargin(payload: number) {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -784,6 +881,9 @@ export class CommandAdapt {
     this.draw.render({ curIndex, isSetCursor })
   }
 
+  /**
+   * 插入表格
+   */
   public insertTable(row: number, col: number) {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -849,6 +949,9 @@ export class CommandAdapt {
     this.draw.render({ curIndex, isSetCursor: false })
   }
 
+  /**
+   * 向上插入一行
+   */
   public insertTableTopRow() {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -914,6 +1017,9 @@ export class CommandAdapt {
     this.tableTool.render()
   }
 
+  /**
+   * 向下插入一行
+   */
   public insertTableBottomRow() {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -981,6 +1087,9 @@ export class CommandAdapt {
     this.tableTool.render()
   }
 
+  /**
+   * 向左插入一列
+   */
   public insertTableLeftCol() {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -1040,6 +1149,9 @@ export class CommandAdapt {
     this.tableTool.render()
   }
 
+  /**
+   * 向右插入一列
+   */
   public insertTableRightCol() {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -1099,6 +1211,9 @@ export class CommandAdapt {
     this.tableTool.render()
   }
 
+  /**
+   * 删除当前行
+   */
   public deleteTableRow() {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -1162,6 +1277,9 @@ export class CommandAdapt {
     this.tableTool.dispose()
   }
 
+  /**
+   * 删除当前列
+   */
   public deleteTableCol() {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -1223,6 +1341,9 @@ export class CommandAdapt {
     this.tableTool.dispose()
   }
 
+  /**
+   * 删除表格
+   */
   public deleteTable() {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -1240,6 +1361,9 @@ export class CommandAdapt {
     this.tableTool.dispose()
   }
 
+  /**
+   * 合并单元格
+   */
   public mergeTableCell() {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -1368,6 +1492,9 @@ export class CommandAdapt {
     this.tableTool.render()
   }
 
+  /**
+   * 取消单元格合并
+   */
   public cancelMergeTableCell() {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -1433,6 +1560,9 @@ export class CommandAdapt {
     this.tableTool.render()
   }
 
+  /**
+   * 设置单元格垂直对齐方式
+   */
   public tableTdVerticalAlign(payload: VerticalAlign) {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -1459,6 +1589,9 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 设置表格边框类型
+   */
   public tableBorderType(payload: TableBorder) {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -1480,6 +1613,9 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 设置单元格边框类型
+   */
   public tableTdBorderType(payload: TdBorder) {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -1515,6 +1651,9 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 设置表格单元格内斜线
+   */
   public tableTdSlashType(payload: TdSlash) {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -1550,6 +1689,9 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 设置表格单元格背景色
+   */
   public tableTdBackgroundColor(payload: string) {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -1569,6 +1711,9 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 选中整个表格
+   */
   public tableSelectAll() {
     const positionContext = this.position.getPositionContext()
     const { index, tableId, isTable } = positionContext
@@ -1594,6 +1739,9 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 插入超链接
+   */
   public hyperlink(payload: IElement) {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -1624,6 +1772,9 @@ export class CommandAdapt {
     this.draw.render({ curIndex })
   }
 
+  /**
+   * 获取选区内超链接的选区
+   */
   public getHyperlinkRange(): [number, number] | null {
     let leftIndex = -1
     let rightIndex = -1
@@ -1660,6 +1811,9 @@ export class CommandAdapt {
     return [leftIndex, rightIndex]
   }
 
+  /**
+   * 删除超链接
+   */
   public deleteHyperlink() {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -1683,6 +1837,9 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 取消超链接
+   */
   public cancelHyperlink() {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -1708,6 +1865,9 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 编辑超链接
+   */
   public editHyperlink(payload: string) {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -1730,6 +1890,9 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 插入分割线
+   */
   public separator(payload: number[]) {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -1770,6 +1933,9 @@ export class CommandAdapt {
     this.draw.render({ curIndex })
   }
 
+  /**
+   * 插入分页符
+   */
   public pageBreak() {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -1783,6 +1949,9 @@ export class CommandAdapt {
     ])
   }
 
+  /**
+   * 添加水印
+   */
   public addWatermark(payload: IWatermark) {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -1800,6 +1969,9 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 删除水印
+   */
   public deleteWatermark() {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -1814,6 +1986,9 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   * 插入图片
+   */
   public image(payload: IDrawImagePayload) {
     const isDisabled =
       this.draw.isReadonly() || this.control.getIsDisabledControl()
@@ -1833,6 +2008,9 @@ export class CommandAdapt {
     ])
   }
 
+  /**
+   * 关键字搜索
+   */
   public search(payload: string | null) {
     this.searchManager.setSearchKeyword(payload)
     this.draw.render({
@@ -1841,6 +2019,9 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 搜索导航-上一个
+   */
   public searchNavigatePre() {
     const index = this.searchManager.searchNavigatePre()
     if (index === null) return
@@ -1852,6 +2033,9 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 搜索导航-下一个
+   */
   public searchNavigateNext() {
     const index = this.searchManager.searchNavigateNext()
     if (index === null) return
@@ -1863,10 +2047,16 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 获取搜索导航信息
+   */
   public getSearchNavigateInfo(): null | INavigateInfo {
     return this.searchManager.getSearchNavigateInfo()
   }
 
+  /**
+   * 搜索替换
+   */
   public replace(payload: string) {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
@@ -1975,6 +2165,9 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 打印
+   */
   public async print() {
     const { scale, printPixelRatio, paperDirection } = this.options
     if (scale !== 1) {
@@ -1996,6 +2189,9 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   * 替换图片
+   */
   public replaceImageElement(payload: string) {
     const { startIndex } = this.range.getRange()
     const elementList = this.draw.getElementList()
@@ -2009,6 +2205,9 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 将图片另存为
+   */
   public saveAsImageElement() {
     const { startIndex } = this.range.getRange()
     const elementList = this.draw.getElementList()
@@ -2017,6 +2216,9 @@ export class CommandAdapt {
     downloadFile(element.value, `${element.id!}.png`)
   }
 
+  /**
+   * 设置图片行显示方式
+   */
   public changeImageDisplay(element: IElement, display: ImageDisplay) {
     if (element.imgDisplay === display) return
     element.imgDisplay = display
@@ -2043,18 +2245,30 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 获取当前页面图片 base64 字符串
+   */
   public getImage(payload?: IGetImageOption): Promise<string[]> {
     return this.draw.getDataURL(payload)
   }
 
+  /**
+   * 获取编辑器的配置对象
+   */
   public getOptions(): DeepRequired<IEditorOption> {
     return this.options
   }
 
+  /**
+   * 获取编辑器的值
+   */
   public getValue(options?: IGetValueOption): IEditorResult {
     return this.draw.getValue(options)
   }
 
+  /**
+   * 获取 HTML
+   */
   public getHTML(): IEditorHTML {
     const options = this.options
     const headerElementList = this.draw.getHeaderElementList()
@@ -2067,6 +2281,9 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   * 获取文本
+   */
   public getText(): IEditorText {
     const headerElementList = this.draw.getHeaderElementList()
     const mainElementList = this.draw.getOriginalMainElementList()
@@ -2078,18 +2295,30 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   * 获取文档字数
+   */
   public getWordCount(): Promise<number> {
     return this.workerManager.getWordCount()
   }
 
+  /**
+   * 获取选区
+   */
   public getRange(): IRange {
     return deepClone(this.range.getRange())
   }
 
+  /**
+   * 获取选区文本
+   */
   public getRangeText(): string {
     return this.range.toString()
   }
 
+  /**
+   * 获取选区上下文
+   */
   public getRangeContext(): RangeContext | null {
     const range = this.range.getRange()
     const { startIndex, endIndex } = range
@@ -2198,24 +2427,39 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 获取选区所在行元素列表
+   */
   public getRangeRow(): IElement[] | null {
     const rowElementList = this.range.getRangeRowElementList()
     return rowElementList ? zipElementList(rowElementList) : null
   }
 
+  /**
+   * 获取选区所在段落元素列表
+   */
   public getRangeParagraph(): IElement[] | null {
     const paragraphElementList = this.range.getRangeParagraphElementList()
     return paragraphElementList ? zipElementList(paragraphElementList) : null
   }
 
+  /**
+   * 获取关键词所在选区列表
+   */
   public getKeywordRangeList(payload: string): IRange[] {
     return this.range.getKeywordRangeList(payload)
   }
 
+  /**
+   * 设置页面模式
+   */
   public pageMode(payload: PageMode) {
     this.draw.setPageMode(payload)
   }
 
+  /**
+   * 恢复页面原始缩放比例
+   */
   public pageScaleRecovery() {
     const { scale } = this.options
     if (scale !== 1) {
@@ -2223,6 +2467,9 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   * 缩小页面比例
+   */
   public pageScaleMinus() {
     const { scale } = this.options
     const nextScale = scale * 10 - 1
@@ -2231,6 +2478,9 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   * 放大页面比例
+   */
   public pageScaleAdd() {
     const { scale } = this.options
     const nextScale = scale * 10 + 1
@@ -2239,22 +2489,37 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   * 设置纸张大小
+   */
   public paperSize(width: number, height: number) {
     this.draw.setPaperSize(width, height)
   }
 
+  /**
+   * 设置纸张方向
+   */
   public paperDirection(payload: PaperDirection) {
     this.draw.setPaperDirection(payload)
   }
 
+  /**
+   * 获取页边距
+   */
   public getPaperMargin(): number[] {
     return this.options.margins
   }
 
+  /**
+   * 设置页边距
+   */
   public setPaperMargin(payload: IMargin) {
     return this.draw.setPaperMargin(payload)
   }
 
+  /**
+   * 插入元素列表
+   */
   public insertElementList(payload: IElement[]) {
     if (!payload.length) return
     const isReadonly = this.draw.isReadonly()
@@ -2269,6 +2534,9 @@ export class CommandAdapt {
     this.draw.insertElementList(cloneElementList)
   }
 
+  /**
+   * 追加元素列表
+   */
   public appendElementList(
     elementList: IElement[],
     options?: IAppendElementListOption
@@ -2279,6 +2547,9 @@ export class CommandAdapt {
     this.draw.appendElementList(deepClone(elementList), options)
   }
 
+  /**
+   * 通过元素 id 更新元素的属性
+   */
   public updateElementById(payload: IUpdateElementByIdOption) {
     function getElementIndexById(elementList: IElement[]): number {
       for (let e = 0; e < elementList.length; e++) {
@@ -2315,10 +2586,16 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   * 设置编辑器数据
+   */
   public setValue(payload: Partial<IEditorData>) {
     this.draw.setValue(payload)
   }
 
+  /**
+   * 移除控件
+   */
   public removeControl() {
     const { startIndex, endIndex } = this.range.getRange()
     if (startIndex !== endIndex) return
@@ -2336,18 +2613,30 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 设置本地语言
+   */
   public setLocale(payload: string) {
     this.i18n.setLocale(payload)
   }
 
+  /**
+   * 获取本地语言
+   */
   public getLocale(): string {
     return this.i18n.getLocale()
   }
 
+  /**
+   * 获取目录
+   */
   public getCatalog(): Promise<ICatalog | null> {
     return this.workerManager.getCatalog()
   }
 
+  /**
+   * 定位目录位置
+   */
   public locationCatalog(titleId: string) {
     const elementList = this.draw.getMainElementList()
     let newIndex = -1
@@ -2370,6 +2659,9 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 文字工具（删除空行、行首空格）
+   */
   public wordTool() {
     const elementList = this.draw.getMainElementList()
     let isApply = false
@@ -2398,6 +2690,9 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   * 设置编辑器 HTML 数据
+   */
   public setHTML(payload: Partial<IEditorHTML>) {
     const { header, main, footer } = payload
     const innerWidth = this.draw.getOriginalInnerWidth()
@@ -2415,22 +2710,34 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 设置成组
+   */
   public setGroup(): string | null {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return null
     return this.draw.getGroup().setGroup()
   }
 
+  /**
+   * 删除成组
+   */
   public deleteGroup(groupId: string) {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
     this.draw.getGroup().deleteGroup(groupId)
   }
 
+  /**
+   * 获取所有成组 id
+   */
   public getGroupIds(): Promise<string[]> {
     return this.draw.getWorkerManager().getGroupIds()
   }
 
+  /**
+   * 根据成组 id 定位成组位置
+   */
   public locationGroup(groupId: string) {
     const elementList = this.draw.getOriginalMainElementList()
     const context = this.draw
@@ -2456,34 +2763,52 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 设置激活区域（页眉、正文、页脚）
+   */
   public setZone(zone: EditorZone) {
     this.draw.getZone().setZone(zone)
   }
 
+  /**
+   * 通过 conceptId 获取控件的值
+   */
   public getControlValue(
     payload: IGetControlValueOption
   ): IGetControlValueResult | null {
     return this.draw.getControl().getValueByConceptId(payload)
   }
 
+  /**
+   * 通过 conceptId 设置控件的值
+   */
   public setControlValue(payload: ISetControlValueOption) {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
     this.draw.getControl().setValueByConceptId(payload)
   }
 
+  /**
+   * 通过 conceptId 设置控件的扩展对象
+   */
   public setControlExtension(payload: ISetControlExtensionOption) {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
     this.draw.getControl().setExtensionByConceptId(payload)
   }
 
+  /**
+   * 通过 conceptId 设置控件的属性
+   */
   public setControlProperties(payload: ISetControlProperties) {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return
     this.draw.getControl().setPropertiesByConceptId(payload)
   }
 
+  /**
+   * 设置控件的高亮
+   */
   public setControlHighlight(payload: ISetControlHighlightOption) {
     this.draw.getControl().setHighlightList(payload)
     this.draw.render({
@@ -2491,6 +2816,9 @@ export class CommandAdapt {
     })
   }
 
+  /**
+   * 更新编辑器配置
+   */
   public updateOptions(payload: IUpdateOption) {
     const newOption = mergeOption(payload)
     Object.entries(newOption).forEach(([key, value]) => {
@@ -2499,10 +2827,16 @@ export class CommandAdapt {
     this.forceUpdate()
   }
 
+  /**
+   * 获取控件列表
+   */
   public getControlList(): IElement[] {
     return this.draw.getControl().getList()
   }
 
+  /**
+   * 根据 controlId 定位控件
+   */
   public locationControl(controlId: string) {
     function location(
       elementList: IElement[],
@@ -2582,10 +2916,16 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   * 获取编辑器容器
+   */
   public getContainer(): HTMLDivElement {
     return this.draw.getContainer()
   }
 
+  /**
+   * 获取标题值
+   */
   public getTitleValue(
     payload: IGetTitleValueOption
   ): IGetTitleValueResult | null {
@@ -2652,6 +2992,9 @@ export class CommandAdapt {
     return result
   }
 
+  /**
+   * 通过鼠标事件获取位置上下文信息
+   */
   public getPositionContextByEvent(
     evt: MouseEvent
   ): IPositionContextByEvent | null {
@@ -2711,6 +3054,9 @@ export class CommandAdapt {
     }
   }
 
+  /**
+   * 插入标题
+   */
   public insertTitle(payload: IElement) {
     const isReadonly = this.draw.isReadonly()
     if (isReadonly) return

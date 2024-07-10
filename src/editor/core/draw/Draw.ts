@@ -822,6 +822,9 @@ export class Draw {
     return dataUrlList
   }
 
+  /**
+   * 获取格式刷的样式
+   */
   public getPainterStyle(): IElementStyle | null {
     return this.painterStyle && Object.keys(this.painterStyle).length
       ? this.painterStyle
