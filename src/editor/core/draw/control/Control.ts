@@ -208,7 +208,16 @@ export class Control {
   }
 
   public getIsDisabledControl(): boolean {
-    return !!this.activeControl?.getElement().control?.disabled
+    if (!this.activeControl) return false
+    const { startIndex, endIndex } = this.range.getRange()
+    if (startIndex === endIndex) {
+      const elementList = this.getElementList()
+      const startElement = elementList[startIndex]
+      if (startElement.controlComponent === ControlComponent.POSTFIX) {
+        return false
+      }
+    }
+    return !!this.activeControl.getElement()?.control?.disabled
   }
 
   public getContainer(): HTMLDivElement {
@@ -712,7 +721,7 @@ export class Control {
         } else if (type === ControlType.CHECKBOX) {
           const checkbox = new CheckboxControl(element, this)
           this.activeControl = checkbox
-          const codes = value?.split(',') || []
+          const codes = value ? value.split(',') : []
           checkbox.setSelect(codes, controlContext, controlRule)
         } else if (type === ControlType.RADIO) {
           const radio = new RadioControl(element, this)
