@@ -685,7 +685,11 @@ export class Draw {
       if (!this.control.getActiveControl()) {
         let deleteIndex = endIndex - 1
         while (deleteIndex >= start) {
-          if (elementList[deleteIndex]?.control?.deletable !== false) {
+          const deleteElement = elementList[deleteIndex]
+          if (
+            deleteElement?.control?.deletable !== false &&
+            deleteElement?.title?.deletable !== false
+          ) {
             elementList.splice(deleteIndex, 1)
           }
           deleteIndex--
@@ -1001,7 +1005,7 @@ export class Draw {
   }
 
   public getValue(options: IGetValueOption = {}): IEditorResult {
-    const { pageNo } = options
+    const { pageNo, extraPickAttrs } = options
     let mainElementList = this.elementList
     if (
       Number.isInteger(pageNo) &&
@@ -1013,9 +1017,15 @@ export class Draw {
       )
     }
     const data: IEditorData = {
-      header: zipElementList(this.getHeaderElementList()),
-      main: zipElementList(mainElementList),
-      footer: zipElementList(this.getFooterElementList())
+      header: zipElementList(this.getHeaderElementList(), {
+        extraPickAttrs
+      }),
+      main: zipElementList(mainElementList, {
+        extraPickAttrs
+      }),
+      footer: zipElementList(this.getFooterElementList(), {
+        extraPickAttrs
+      })
     }
     return {
       version,
@@ -1563,8 +1573,9 @@ export class Draw {
               i
             )
             // 单词宽度大于行可用宽度，无需折行
-            if (width <= availableWidth) {
-              curRowWidth += width
+            const wordWidth = width * scale
+            if (wordWidth <= availableWidth) {
+              curRowWidth += wordWidth
               nextElement = endElement
             }
           }

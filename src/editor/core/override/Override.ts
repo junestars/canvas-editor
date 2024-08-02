@@ -1,3 +1,5 @@
+import { IPasteEventData } from '../../interface/Event'
+
 export interface IOverrideResult {
   preventDefault?: boolean
 }
@@ -5,15 +7,9 @@ export interface IOverrideResult {
 export class Override {
   public paste:
     | ((
-        evt?: ClipboardEvent
-      ) => void | Promise<void> | IOverrideResult | Promise<IOverrideResult>)
+        evt?: ClipboardEvent | IPasteEventData
+      ) => unknown | IOverrideResult | Promise<unknown>)
     | undefined
-  public copy:
-    | (() => void | Promise<void> | IOverrideResult | Promise<IOverrideResult>)
-    | undefined
-  public drop:
-    | ((
-        evt: DragEvent
-      ) => void | Promise<void> | IOverrideResult | Promise<IOverrideResult>)
-    | undefined
+  public copy: (() => unknown | IOverrideResult) | undefined
+  public drop: ((evt: DragEvent) => unknown | IOverrideResult) | undefined
 }
